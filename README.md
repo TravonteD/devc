@@ -10,6 +10,14 @@
   + `kill`: Does a full shutdown and removal of the current devcontainer 
   + `restart`: Kills the devcontainer and starts a new one from scratch
 
+## Installation
+- Install the following dependencies:
+  - `jq`
+  - `gum`
+  - `devcontainer`
+
+- Update the `makefile` with your desired installation directory and command name
+- Run `make install`
 
 ## Usage
 
