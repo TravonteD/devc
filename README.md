@@ -1,4 +1,4 @@
-# devc: A convenience wrapper around the [devcontainer-cli](https://github.com/devcontainers/cli)
+# devc: A convenient wrapper around the [devcontainer-cli](https://github.com/devcontainers/cli)
 
 ## Features
 
