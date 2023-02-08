@@ -38,6 +38,11 @@ case ${command} in
       docker container exec -w "${container_folder}" -it "${container_id}" bash
     fi
     ;;
+  stop)
+    if [ -n "${container_id}" ]
+    then
+      docker container stop "${container_id}"
+    fi
   kill)
     image_id=$(docker image ls | grep "vsc-$(basename $(pwd))" | cut -d' ' -f1)
     volume_id=$(docker volume ls | grep "vsc-$(basename $(pwd))" | cut -d' ' -f1)
