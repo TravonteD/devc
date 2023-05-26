@@ -10,7 +10,7 @@ $(INSTALLATION_DIR)/$(PROGRAM_NAME): dev.sh
 	cp $^ $@
 
 $(MAN_DIR)/$(PROGRAM_NAME).1: $(MAN_DIR) $(PROGRAM_NAME).1
-	cp $^ $@
+	cp $(PROGRAM_NAME).1 $@
 
 $(PROGRAM_NAME).1: man.md
 	pandoc --standalone $^ -o $@
