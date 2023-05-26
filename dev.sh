@@ -13,8 +13,20 @@ else
   command=$(gum choose "up" "exec" "edit" "shell" "kill" "restart")
 fi
 
-container_id=$(jq -r '.containerId' < .container.json)
-container_folder=$(jq -r '.remoteWorkspaceFolder' < .container.json)
+if [ -f ".container.json" ]
+then
+  container_id=$(jq -r '.containerId' < .container.json)
+  container_folder=$(jq -r '.remoteWorkspaceFolder' < .container.json)
+fi
+
+run_with_existing() {
+  if [ -n "${container_id}" ]
+  then
+    $*
+  else
+    printf "%s" "container found. bring up the container using `devc up`"
+  fi
+}
 
 case ${command} in
   up)
@@ -27,22 +39,16 @@ case ${command} in
     else
       cmd=$(gum input --prompt "Enter the command to execute: ")
     fi
-    docker container exec -w "${container_folder}" -it "${container_id}" ${cmd}
+    run_with_existing docker container exec -w "${container_folder}" -it "${container_id}" ${cmd}
     ;;
   edit)
     $EDITOR .devcontainer/devcontainer.json
     ;;
   shell)
-    if [ -n "${container_id}" ]
-    then
-      docker container exec -w "${container_folder}" -it "${container_id}" bash
-    fi
+    run_with_existing docker container exec -w "${container_folder}" -it "${container_id}" bash
     ;;
   stop)
-    if [ -n "${container_id}" ]
-    then
-      docker container stop "${container_id}"
-    fi
+    run_with_existing docker container stop "${container_id}"
     ;;
   kill)
     image_id=$(docker image ls | grep "vsc-$(basename $(pwd))" | cut -d' ' -f1)
