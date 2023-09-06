@@ -61,6 +61,9 @@ case ${command} in
     fi
     ;;
   restart)
+    run_with_existing docker container restart "${container_id}"
+    ;;
+  rebuild)
     $0 kill; $0 up
     ;;
   *)

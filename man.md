@@ -41,11 +41,14 @@ Options
 
 : Stops the container without removing it
 
+`restart`
+
+: restarts the container without rebuilding
+
 `kill`
 
 : Removes the container, image, and volume for the container
 
-`restart`
+`rebuild (formerly restart)`
 
 : equivalent to **kill** + **up**
-
