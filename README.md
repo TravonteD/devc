@@ -8,7 +8,8 @@
   + `shell`: Starts a shell in the devcontainer at the workspace directory
   + `edit`: A quick shortcut for opening your `devcontainer.json` with your favorite editor (Be sure to export `EDITOR` for this functionality)
   + `kill`: Does a full shutdown and removal of the current devcontainer 
-  + `restart`: Kills the devcontainer and starts a new one from scratch
+  + `restart`: Does a quick reboot of the devcontainer
+  + `rebuild`: Kills the devcontainer and starts a new one from scratch
 
 ## Installation
 - Install the following dependencies:
@@ -32,4 +33,5 @@ Available commands:
   - shell : Starts an interactive shell in the container at the workspace folder
   - stop : Stops the container without removing it
   - kill : Removes the container, image, and volume for the container
-  - restart : equivalent to **kill** + **up**
+  - restart : Reboots the container
+  - rebuild : equivalent to **kill** + **up**

@@ -1,8 +1,8 @@
 #!/bin/sh
 
-if ! command -v gum > /dev/null
+if ! [ -f .devcontainer.json ] &&  ! [ -f .devcontainer/devcontainer.json ]
 then
-  printf "%s" 'gum is not installed. install it via homebrew with `brew install gum`'
+  printf "No devcontainer configuration found would you like to create one?"
 fi
 
 if [ -n "$1" ]
