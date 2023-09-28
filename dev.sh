@@ -1,5 +1,7 @@
 #!/bin/sh
 
+SHELL=${DEVC_SHELL:-bash}
+
 if ! [ -f .devcontainer.json ] &&  ! [ -f .devcontainer/devcontainer.json ]
 then
   printf "No devcontainer configuration found would you like to create one?"
@@ -45,7 +47,7 @@ case ${command} in
     $EDITOR .devcontainer/devcontainer.json
     ;;
   shell)
-    run_with_existing docker container exec -w "${container_folder}" -it "${container_id}" bash
+    run_with_existing docker container exec -w "${container_folder}" -it "${container_id}" $SHELL
     ;;
   stop)
     run_with_existing docker container stop "${container_id}"

@@ -52,3 +52,9 @@ Options
 `rebuild (formerly restart)`
 
 : equivalent to **kill** + **up**
+
+Configuration
+=============
+
+`DEVC_SHELL`
+: The default shell to use when running `devc shell`
