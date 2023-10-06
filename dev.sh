@@ -48,7 +48,7 @@ else
   COMMAND=$(gum choose "up" "exec" "edit" "shell" "kill" "restart")
 fi
 
-CONTAINER_FILE="$CACHE_DIR/.$(basename "$PWD")).json" 
+CONTAINER_FILE="$CACHE_DIR/.$(basename "$PWD").json" 
 
 # Handle deprecation of the old .container.json in the working directory
 OLD_CONTAINER_FILE=".container.json" 
