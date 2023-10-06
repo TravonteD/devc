@@ -1,8 +1,18 @@
 #!/bin/sh
 
 SHELL=${DEVC_SHELL:-bash}
-
 DEVCONTAINER_JSON=""
+if [ -n "$XDG_CACHE_DIR" ]
+then
+  CACHE_DIR="$XDG_CACHE_DIR/devc"
+else
+  CACHE_DIR="$HOME/.cache/devc"
+fi
+if ! [ -d "$CACHE_DIR" ]
+then
+  mkdir -p "$CACHE_DIR"
+fi
+
 
 if [ -f ".devcontainer.json" ]
 then
@@ -38,7 +48,14 @@ else
   COMMAND=$(gum choose "up" "exec" "edit" "shell" "kill" "restart")
 fi
 
-CONTAINER_FILE=".container.json" 
+CONTAINER_FILE="$CACHE_DIR/.$(basename "$PWD")).json" 
+
+# Handle deprecation of the old .container.json in the working directory
+OLD_CONTAINER_FILE=".container.json" 
+if [ -f "$OLD_CONTAINER_FILE" ]
+then
+  mv "$OLD_CONTAINER_FILE" "$CONTAINER_FILE"
+fi
 
 if [ -f "$CONTAINER_FILE" ]
 then
@@ -57,7 +74,7 @@ run_with_existing() {
 
 case ${COMMAND} in
   up)
-    devcontainer up --workspace-folder . > .container.json
+    devcontainer up --workspace-folder . > "$CONTAINER_FILE"
     ;;
   exec)
     if [ -n "$*" ]
