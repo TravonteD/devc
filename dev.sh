@@ -2,27 +2,52 @@
 
 SHELL=${DEVC_SHELL:-bash}
 
-if ! [ -f .devcontainer.json ] &&  ! [ -f .devcontainer/devcontainer.json ]
+DEVCONTAINER_JSON=""
+
+if [ -f ".devcontainer.json" ]
 then
-  printf "No devcontainer configuration found would you like to create one?"
+  DEVCONTAINER_JSON=".devcontainer.json "
+elif [ -f ".devcontainer/devcontainer.json" ]
+then
+  DEVCONTAINER_JSON=".devcontainer/devcontainer.json"
+fi
+
+if [ -z "$DEVCONTAINER_JSON" ]
+then
+  if gum confirm "No devcontainer configuration found would you like to create one?"
+  then
+    CHOICE=$(gum choose "standalone (.devcontainer.json)" "directory (.devcontainer/devcontainer.json)" | cut -d' ' -f1)
+    case $CHOICE in
+      standalone)
+        touch ".devcontainer.json"
+        ;;
+      directory)
+        mkdir -p ".devcontainer" && touch ".devcontainer/devcontainer.json"
+        ;;
+    esac
+  else
+    exit
+  fi
 fi
 
 if [ -n "$1" ]
 then
-  command=$1
+  COMMAND=$1
   shift
 else
-  command=$(gum choose "up" "exec" "edit" "shell" "kill" "restart")
+  COMMAND=$(gum choose "up" "exec" "edit" "shell" "kill" "restart")
 fi
 
-if [ -f ".container.json" ]
+CONTAINER_FILE=".container.json" 
+
+if [ -f "$CONTAINER_FILE" ]
 then
-  container_id=$(jq -r '.containerId' < .container.json)
-  container_folder=$(jq -r '.remoteWorkspaceFolder' < .container.json)
+  CONTAINER_ID=$(jq -r '.containerId' < "$CONTAINER_FILE")
+  CONTAINER_FOLDER=$(jq -r '.remoteWorkspaceFolder' < "$CONTAINER_FILE")
 fi
 
 run_with_existing() {
-  if [ -n "${container_id}" ]
+  if [ -n "${CONTAINER_ID}" ]
   then
     $*
   else
@@ -30,40 +55,44 @@ run_with_existing() {
   fi
 }
 
-case ${command} in
+case ${COMMAND} in
   up)
     devcontainer up --workspace-folder . > .container.json
     ;;
   exec)
     if [ -n "$*" ]
     then
-      cmd="$*"
+      CMD="$*"
     else
-      cmd=$(gum input --prompt "Enter the command to execute: ")
+      CMD=$(gum input --prompt "Enter the command to execute: ")
     fi
-    run_with_existing docker container exec -w "${container_folder}" -it "${container_id}" ${cmd}
+    run_with_existing docker container exec -w "${CONTAINER_FOLDER}" -it "${CONTAINER_ID}" ${CMD}
     ;;
   edit)
-    $EDITOR .devcontainer/devcontainer.json
+    if [ -f ".devcontainer.json" ]; then
+      $EDITOR .devcontainer.json
+    else
+      $EDITOR .devcontainer/devcontainer.json
+    fi
     ;;
   shell)
-    run_with_existing docker container exec -w "${container_folder}" -it "${container_id}" $SHELL
+    run_with_existing docker container exec -w "${CONTAINER_FOLDER}" -it "${CONTAINER_ID}" $SHELL
     ;;
   stop)
-    run_with_existing docker container stop "${container_id}"
+    run_with_existing docker container stop "${CONTAINER_ID}"
     ;;
   kill)
-    image_id=$(docker image ls | grep "vsc-$(basename $(pwd))" | cut -d' ' -f1)
-    volume_id=$(docker volume ls | grep "vsc-$(basename $(pwd))" | cut -d' ' -f1)
-    if [ -n "${container_id}" ]
+    IMAGE_ID=$(docker image ls | grep "vsc-$(basename $(pwd))" | cut -d' ' -f1)
+    VOLUME_ID=$(docker volume ls | grep "vsc-$(basename $(pwd))" | cut -d' ' -f1)
+    if [ -n "${CONTAINER_ID}" ]
     then
-      gum spin --title "Removing devcontainer" -- docker container rm --force "${container_id}"
-      gum spin --title "Removing image" -- docker image rm --force "${image_id}"
-      gum spin --title "Removing volume" -- docker volume rm --force "${volume_id}"
+      gum spin --title "Removing devcontainer" -- docker container rm --force "${CONTAINER_ID}"
+      gum spin --title "Removing image" -- docker image rm --force "${IMAGE_ID}"
+      gum spin --title "Removing volume" -- docker volume rm --force "${VOLUME_ID}"
     fi
     ;;
   restart)
-    run_with_existing docker container restart "${container_id}"
+    run_with_existing docker container restart "${CONTAINER_ID}"
     ;;
   rebuild)
     $0 kill; $0 up
