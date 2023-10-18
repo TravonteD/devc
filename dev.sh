@@ -1,19 +1,9 @@
 #!/bin/sh
 
 SHELL=${DEVC_SHELL:-bash}
+
+# Check for devcontainer configuration
 DEVCONTAINER_JSON=""
-if [ -n "$XDG_CACHE_DIR" ]
-then
-  CACHE_DIR="$XDG_CACHE_DIR/devc"
-else
-  CACHE_DIR="$HOME/.cache/devc"
-fi
-if ! [ -d "$CACHE_DIR" ]
-then
-  mkdir -p "$CACHE_DIR"
-fi
-
-
 if [ -f ".devcontainer.json" ]
 then
   DEVCONTAINER_JSON=".devcontainer.json "
@@ -40,23 +30,24 @@ then
   fi
 fi
 
-if [ -n "$1" ]
+# Check for existing devcontiainer
+if [ -n "$XDG_CACHE_DIR" ]
 then
-  COMMAND=$1
-  shift
+  CACHE_DIR="$XDG_CACHE_DIR/devc"
 else
-  COMMAND=$(gum choose "up" "exec" "edit" "shell" "kill" "restart")
+  CACHE_DIR="$HOME/.cache/devc"
 fi
-
+if ! [ -d "$CACHE_DIR" ]
+then
+  mkdir -p "$CACHE_DIR"
+fi
 CONTAINER_FILE="$CACHE_DIR/.$(basename "$PWD").json" 
-
 # Handle deprecation of the old .container.json in the working directory
 OLD_CONTAINER_FILE=".container.json" 
 if [ -f "$OLD_CONTAINER_FILE" ]
 then
   mv "$OLD_CONTAINER_FILE" "$CONTAINER_FILE"
 fi
-
 if [ -f "$CONTAINER_FILE" ]
 then
   CONTAINER_ID=$(jq -r '.containerId' < "$CONTAINER_FILE")
@@ -71,6 +62,15 @@ run_with_existing() {
     printf "%s" "container found. bring up the container using `devc up`"
   fi
 }
+
+if [ -n "$1" ]
+then
+  COMMAND=$1
+  shift
+else
+  COMMAND=$(gum choose "up" "exec" "edit" "shell" "kill" "restart")
+fi
+
 
 case ${COMMAND} in
   up)
@@ -106,6 +106,7 @@ case ${COMMAND} in
       gum spin --title "Removing devcontainer" -- docker container rm --force "${CONTAINER_ID}"
       gum spin --title "Removing image" -- docker image rm --force "${IMAGE_ID}"
       gum spin --title "Removing volume" -- docker volume rm --force "${VOLUME_ID}"
+      rm $CONTAINER_FILE
     fi
     ;;
   restart)
