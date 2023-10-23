@@ -1,0 +1,10 @@
+{
+  "name": "devc",
+  "image": "ubuntu:20.04",
+  "containerUser": ""
+  "postCreateCommand": "apt update -qq && apt install -yqq shellcheck",
+  "containerEnv": {
+    
+  },
+  "runArgs": ["--name=devc-dev"]
+}

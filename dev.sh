@@ -19,12 +19,15 @@ then
     CHOICE=$(gum choose "standalone (.devcontainer.json)" "directory (.devcontainer/devcontainer.json)" | cut -d' ' -f1)
     case $CHOICE in
       standalone)
+        DEVCONTAINER_JSON=".devcontainer.json"
         touch ".devcontainer.json"
         ;;
       directory)
+        DEVCONTAINER_JSON=".devcontainer/devcontainer.json"
         mkdir -p ".devcontainer" && touch ".devcontainer/devcontainer.json"
         ;;
     esac
+    EDITOR="$DEVCONTAINER_JSON"
   else
     exit
   fi
@@ -57,9 +60,9 @@ fi
 run_with_existing() {
   if [ -n "${CONTAINER_ID}" ]
   then
-    $*
+    "$*"
   else
-    printf "%s" "container found. bring up the container using `devc up`"
+    printf 'container found. bring up the container using "devc up"'
   fi
 }
 
@@ -71,49 +74,72 @@ else
   COMMAND=$(gum choose "up" "exec" "edit" "shell" "kill" "restart")
 fi
 
-
-case ${COMMAND} in
-  up)
+devc_up() {
     devcontainer up --workspace-folder . > "$CONTAINER_FILE"
-    ;;
-  exec)
+}
+
+devc_exec() {
     if [ -n "$*" ]
     then
       CMD="$*"
     else
       CMD=$(gum input --prompt "Enter the command to execute: ")
     fi
-    run_with_existing docker container exec -w "${CONTAINER_FOLDER}" -it "${CONTAINER_ID}" ${CMD}
-    ;;
-  edit)
+    run_with_existing docker container exec -w "${CONTAINER_FOLDER}" -it "${CONTAINER_ID}" "${CMD}"
+}
+
+devc_edit() {
     if [ -f ".devcontainer.json" ]; then
       $EDITOR .devcontainer.json
     else
       $EDITOR .devcontainer/devcontainer.json
     fi
-    ;;
-  shell)
-    run_with_existing docker container exec -w "${CONTAINER_FOLDER}" -it "${CONTAINER_ID}" $SHELL
-    ;;
-  stop)
-    run_with_existing docker container stop "${CONTAINER_ID}"
-    ;;
-  kill)
-    IMAGE_ID=$(docker image ls | grep "vsc-$(basename $(pwd))" | cut -d' ' -f1)
-    VOLUME_ID=$(docker volume ls | grep "vsc-$(basename $(pwd))" | cut -d' ' -f1)
+}
+
+devc_kill() {
+    IMAGE_ID=$(docker image ls | grep "vsc-$(basename "$PWD")" | cut -d' ' -f1)
+    VOLUME_ID=$(docker volume ls | grep "vsc-$(basename "$PWD")" | cut -d' ' -f1)
     if [ -n "${CONTAINER_ID}" ]
     then
       gum spin --title "Removing devcontainer" -- docker container rm --force "${CONTAINER_ID}"
       gum spin --title "Removing image" -- docker image rm --force "${IMAGE_ID}"
       gum spin --title "Removing volume" -- docker volume rm --force "${VOLUME_ID}"
-      rm $CONTAINER_FILE
+      rm "$CONTAINER_FILE"
     fi
+}
+
+devc_shell() {
+    run_with_existing docker container exec -w "${CONTAINER_FOLDER}" -it "${CONTAINER_ID}" "$SHELL"
+}
+
+
+case ${COMMAND} in
+  up)
+    devc_up
+    ;;
+  exec)
+    devc_exec "$*"
+    ;;
+  edit)
+    devc_edit
+    ;;
+  shell)
+    devc_shell
+    ;;
+  start)
+    devc_up && devc_shell
+    ;;
+  stop)
+    run_with_existing docker container stop "${CONTAINER_ID}"
+    ;;
+  kill)
+    devc_kill
     ;;
   restart)
     run_with_existing docker container restart "${CONTAINER_ID}"
     ;;
   rebuild)
-    $0 kill; $0 up
+    devc_kill; devc_up
     ;;
   *)
     printf "no command specified\n"
