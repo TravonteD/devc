@@ -57,13 +57,17 @@ then
   CONTAINER_FOLDER=$(jq -r '.remoteWorkspaceFolder' < "$CONTAINER_FILE")
 fi
 
+devc_up() {
+    devcontainer up --workspace-folder . > "$CONTAINER_FILE"
+}
+
 run_with_existing() {
-  if [ -n "${CONTAINER_ID}" ]
+  if ! [ -n "${CONTAINER_ID}" ]
   then
-    "$*"
-  else
-    printf 'container found. bring up the container using "devc up"'
+    printf 'container found. bringing up the container using "devc up"'
+    devc_up
   fi
+  $*
 }
 
 if [ -n "$1" ]
@@ -71,12 +75,8 @@ then
   COMMAND=$1
   shift
 else
-  COMMAND=$(gum choose "up" "exec" "edit" "shell" "kill" "restart")
+  COMMAND=$(gum choose "up" "exec" "background" "logs" "edit" "shell" "kill" "restart")
 fi
-
-devc_up() {
-    devcontainer up --workspace-folder . > "$CONTAINER_FILE"
-}
 
 devc_exec() {
     if [ -n "$*" ]
@@ -86,6 +86,16 @@ devc_exec() {
       CMD=$(gum input --prompt "Enter the command to execute: ")
     fi
     run_with_existing docker container exec -w "${CONTAINER_FOLDER}" -it "${CONTAINER_ID}" "${CMD}"
+}
+
+devc_background() {
+    if [ -n "$*" ]
+    then
+      CMD="$*"
+    else
+      CMD=$(gum input --prompt "Enter the command to execute: ")
+    fi
+    run_with_existing docker container exec -w "${CONTAINER_FOLDER}" -dt "${CONTAINER_ID}" "${CMD}"
 }
 
 devc_edit() {
@@ -119,6 +129,9 @@ case ${COMMAND} in
     ;;
   exec)
     devc_exec "$*"
+    ;;
+  background)
+    devc_background "$*"
     ;;
   edit)
     devc_edit

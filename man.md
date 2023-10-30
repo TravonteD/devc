@@ -29,6 +29,10 @@ Options
 
 : Runs a single command in the container
 
+`background`
+
+: Same as `exec`, but in the background
+
 `edit`
 
 : Opens the `.devcontainer/devcontainer.json` in your `$EDITOR`
@@ -43,7 +47,7 @@ Options
 
 `restart`
 
-: restarts the container without rebuilding
+: Restarts the container without rebuilding
 
 `kill`
 
@@ -51,7 +55,7 @@ Options
 
 `rebuild (formerly restart)`
 
-: equivalent to **kill** + **up**
+: Equivalent to **kill** + **up**
 
 Configuration
 =============

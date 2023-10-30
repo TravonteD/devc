@@ -29,9 +29,10 @@ devc [command]
 Available commands:
   - up : Starts the dev-container
   - exec : Runs a single command in the container
+  - background : Same as `exec` in the background
   - edit : Opens the `.devcontainer/devcontainer.json` in your `$EDITOR`
   - shell : Starts an interactive shell in the container at the workspace folder
   - stop : Stops the container without removing it
   - kill : Removes the container, image, and volume for the container
   - restart : Reboots the container
-  - rebuild : equivalent to **kill** + **up**
+  - rebuild : Equivalent to **kill** + **up**
