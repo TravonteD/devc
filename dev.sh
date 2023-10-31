@@ -59,7 +59,7 @@ fi
 
 devc_up() {
     devcontainer up --workspace-folder . > "$CONTAINER_FILE"
-    sed -i '/^{/!d' "$CONTAINER_FILE"
+    sed -i -e '/^{/!d' "$CONTAINER_FILE"
 }
 
 run_with_existing() {
