@@ -27,7 +27,7 @@ then
         mkdir -p ".devcontainer" && touch ".devcontainer/devcontainer.json"
         ;;
     esac
-    EDITOR="$DEVCONTAINER_JSON"
+    $EDITOR "$DEVCONTAINER_JSON"
   else
     exit
   fi
@@ -63,7 +63,7 @@ devc_up() {
 }
 
 run_with_existing() {
-  if ! [ -n "${CONTAINER_ID}" ]
+  if [ -z "${CONTAINER_ID}" ]
   then
     printf 'container found. bringing up the container using "devc up"'
     devc_up
