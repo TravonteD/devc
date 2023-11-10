@@ -12,6 +12,33 @@ then
   DEVCONTAINER_JSON=".devcontainer/devcontainer.json"
 fi
 
+create_devcontainer() {
+  local FILE="$1"
+
+  cat <<EOF > "$FILE"
+{
+  "name": "",
+  "image": "",
+  "build": {
+    "dockerfile": "",
+    "context": "",
+    "args": {
+    }
+  },
+  "appPort": [
+  ],
+  "containerUser": "",
+  "postCreateCommand": "",
+  "containerEnv": {
+  },
+  "features": {
+  },
+  "runArgs": [
+  ]
+}
+EOF
+}
+
 if [ -z "$DEVCONTAINER_JSON" ]
 then
   if gum confirm "No devcontainer configuration found would you like to create one?"
@@ -20,11 +47,11 @@ then
     case $CHOICE in
       standalone)
         DEVCONTAINER_JSON=".devcontainer.json"
-        touch ".devcontainer.json"
+        create_devcontainer ".devcontainer.json"
         ;;
       directory)
         DEVCONTAINER_JSON=".devcontainer/devcontainer.json"
-        mkdir -p ".devcontainer" && touch ".devcontainer/devcontainer.json"
+        mkdir -p ".devcontainer" && create_devcontainer ".devcontainer/devcontainer.json"
         ;;
     esac
     $EDITOR "$DEVCONTAINER_JSON"
