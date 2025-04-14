@@ -17,7 +17,7 @@ create_devcontainer() {
 
   cat <<EOF > "$FILE"
 {
-  "name": "",
+  "name": "$(basename $PWD)-dev",
   "image": "",
   "build": {
     "dockerfile": "",
@@ -103,7 +103,7 @@ then
   COMMAND=$1
   shift
 else
-  COMMAND=$(gum choose "up" "exec" "background" "logs" "edit" "shell" "kill" "restart")
+  COMMAND=$(gum choose "up" "exec" "background" "logs" "edit" "shell" "kill" "rebuild" "restart")
 fi
 
 devc_exec() {
