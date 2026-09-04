@@ -11,9 +11,6 @@ commands that make working with devcontainers a better experience.
 .SH Options
 .SS Available commands:
 .TP
-\f[CR]up\f[R]
-Starts the dev-container
-.TP
 \f[CR]exec\f[R]
 Runs a single command in the container
 .TP
@@ -27,6 +24,9 @@ Opens the \f[CR].devcontainer/devcontainer.json\f[R] in your
 \f[CR]shell\f[R]
 Starts an interactive shell in the container at the workspace folder
 .TP
+\f[CR]start\f[R]
+Starts the dev-container and attaches to it (equivalent to \f[B]up\f[R] + \f[B]shell\f[R])
+.TP
 \f[CR]stop\f[R]
 Stops the container without removing it
 .TP
@@ -38,6 +38,9 @@ Removes the container, image, and volume for the container
 .TP
 \f[CR]rebuild (formerly restart)\f[R]
 Equivalent to \f[B]kill\f[R] + \f[B]up\f[R]
+.TP
+\f[CR]help\f[R]
+Show this help message
 .SH Configuration
 .TP
 \f[CR]DEVC_SHELL\f[R]

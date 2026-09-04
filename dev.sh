@@ -150,8 +150,25 @@ devc_shell() {
     run_with_existing docker container exec -w "${CONTAINER_FOLDER}" -it "${CONTAINER_ID}" "$SHELL"
 }
 
+devc_help() {
+    printf "Available commands:\n"
+    printf "  up        - Start the dev-container\n"
+    printf "  exec      - Run a single command in the container\n"
+    printf "  background- Run a command in the background\n"
+    printf "  edit      - Open .devcontainer/devcontainer.json in \$EDITOR\n"
+    printf "  shell     - Start an interactive shell in the container\n"
+    printf "  start     - Start and attach to the container (up + shell)\n"
+    printf "  stop      - Stop the container without removing it\n"
+    printf "  restart   - Restart the container without rebuilding\n"
+    printf "  kill      - Remove container, image, and volume\n"
+    printf "  rebuild   - Kill and up (rebuild the container)\n"
+    printf "  help      - Show this help message\n"
+}
 
 case ${COMMAND} in
+  help)
+    devc_help
+    ;;
   up)
     devc_up
     ;;
